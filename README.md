@@ -1,25 +1,65 @@
-# CS-350 - Emerging Sys Arch & Tech (Embedded Software Programming)
+## Example Summary
 
-**Summarize the project and what problem it was solving.**
+Application that toggles an LED(s) using a GPIO pin interrupt.
 
-The project was to create a smart thermostat with a variety of functionality, including buttons that turned temperature up or down, LED display to indicate heat was on or not, using UART to simulate sending data to server, and a timer to drive this functionality.  The project also included a report on the project demonstrating that it meets the business requirements and technical specifications, as well as a proposal for how to connect this thermostat to the cloud.
+## Peripherals & Pin Assignments
 
-**What did you do particularly well?**
+When this project is built, the SysConfig tool will generate the TI-Driver
+configurations into the __ti_drivers_config.c__ and __ti_drivers_config.h__
+files. Information on pins and resources used is present in both generated
+files. Additionally, the System Configuration file (\*.syscfg) present in the
+project may be opened with SysConfig's graphical user interface to determine
+pins and resources used.
 
-I did a good job approaching the project with planning and care.  I used pseudocode and diagrams to plot out what the project would look like and worked far in advance, which allowed me to have most elements completed well in advance of the deadline.  
+* `CONFIG_GPIO_LED_0` - Indicates that the board was initialized within
+`mainThread()` also toggled by `CONFIG_GPIO_BUTTON_0`
+* `CONFIG_GPIO_LED_1` - Toggled by `CONFIG_GPIO_BUTTON_1`
+* `CONFIG_GPIO_BUTTON_0` - Toggles `CONFIG_GPIO_LED_0`
+* `CONFIG_GPIO_BUTTON_1` - Toggles `CONFIG_GPIO_LED_1`
 
-**Where could you improve?**
+## BoosterPacks, Board Resources & Jumper Settings
 
-It feels fairly strong overall, but I could possibly revisit the task schedule element and find a more elegant code to replace what I used, but mine functioned perfectly so I left it as is for the time being.
+For board specific jumper settings, resources and BoosterPack modifications,
+refer to the __Board.html__ file.
 
-**What tools and/or resources are you adding to your support network?**
+> If you're using an IDE such as Code Composer Studio (CCS) or IAR, please
+refer to Board.html in your project directory for resources used and
+board-specific jumper settings.
 
-I definitely feel more comfortable with embedded programming, as well as some of the tools to find aid online (ranging from documention for the specific board/hardware components to subreddits and specific YouTube channels).
+The Board.html can also be found in your SDK installation:
 
-**What skills from this project will be particularly transferable to other projects and/or course work?**
+        <SDK_INSTALL_DIR>/source/ti/boards/<BOARD>
 
-Combining many different elements of code (timer, GPIO, UART, I2C, task scheduler, etc) was really helpful for practicing writing good, modular code.  Practice with diagrams and state machines was also really helpful and potentially useful in many other scenarios.
+## Example Usage
 
-**How did you make this project maintainable, readable, and adaptable?**
+* Run the example. `CONFIG_GPIO_LED_0` turns ON to indicate driver
+initialization is complete.
 
-In addition to exercising care to keep each bit of code modular, which helps with all the above, I also tried to include careful comments and easily understandable variables/method names to make the project easy to come back to or to identify to someone unfamiliar with the work.
+* `CONFIG_GPIO_LED_0` is toggled by pushing `CONFIG_GPIO_BUTTON_0`.
+* `CONFIG_GPIO_LED_1` is toggled by pushing `CONFIG_GPIO_BUTTON_1`.
+
+## Application Design Details
+
+* The `gpioButtonFxn0`/`gpioButtonFxn1` functions are configured in the driver configuration
+file. These functions are called in the context of the GPIO interrupt.
+
+* Not all boards have more than one button, so `CONFIG_GPIO_LED_1` may not be
+toggled.
+
+* There is no button de-bounce logic in the example.
+
+TI-RTOS:
+
+* When building in Code Composer Studio, the configuration project will be
+imported along with the example. These projects can be found under
+\<SDK_INSTALL_DIR>\/kernel/tirtos/builds/\<BOARD\>/(release|debug)/(ccs|gcc).
+The configuration project is referenced by the example, so it
+will be built first. The "release" configuration has many debug features
+disabled. These features include assert checking, logging and runtime stack
+checks. For a detailed difference between the "release" and "debug"
+configurations, please refer to the TI-RTOS Kernel User's Guide.
+
+FreeRTOS:
+
+* Please view the `FreeRTOSConfig.h` header file for example configuration
+information.
